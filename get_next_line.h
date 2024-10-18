@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:15 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/17 18:07:57 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/18 16:34:01 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 char	*get_next_line(int fd);
 
 // Utils
+char *ft_first_read(const char *buf);
+char *ft_malloc_cat(char *old_line, const char *buf);
 char	*ft_next_n(char *buf);
 
 #endif

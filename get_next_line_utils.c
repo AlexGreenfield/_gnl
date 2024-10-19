@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/18 17:46:33 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/19 21:31:09 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,65 +16,66 @@
 
 #include "get_next_line.h"
 
-char	*ft_first_read(const char *buf) // We need to read const variable char here
+size_t	ft_strlen(const char *s)
 {
-	char	*first_line;
-	int		i;
+	size_t	string_size;
 
-	i = 0;
-	first_line = malloc (BUFFER_SIZE + 1 * sizeof(char)); // Not buffersize, but buf_len
-	if (!first_line)
+	string_size = 0;
+	while (s[string_size] != '\0')
+		string_size++;
+	return (string_size);
+}
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+{
+	size_t	src_len;
+
+	src_len = ft_strlen(src);
+	if (size == 0)
+		return (src_len);
+	while (*src && size-- > 1)
+		*dst++ = *src++;
+	*dst = '\0';
+	return (src_len);
+}
+// Copies a const string on a new string with malloc
+char	*ft_strdup(const char *s)
+{
+	char	*new_string;
+	size_t	sl;
+
+	sl = ft_strlen(s) + 1;
+	new_string = malloc(sl);
+	if (new_string == NULL)
 		return (NULL);
-	while (buf[i] != '\0') // Call to ft_strlen?
-	{
-		first_line[i] = buf[i];
-		i++;
-	}
-	first_line[i] = '\0';
-	return (first_line);
+	ft_strlcpy(new_string, s, sl);
+	return (new_string);
 }
 
-// Cats line with buffer
-char	*ft_malloc_cat(char *old_line, const char *buf) // Liberar lineeeee
+char	*ft_strchr(const char *s)
 {
-	int		line_len;
-	int		buf_len;
-	int		i;
-	char	*line_cat;
+	char	*c_find_pointer;
 
-	line_len = 0;
-	buf_len = 0;
-	i = 0;
-	while (old_line [line_len] != '\0') // Maybe we should create ft_strlen
-		line_len++;
-	while (buf [buf_len] != '\0')
-		buf_len++;
-	line_cat = malloc(line_len + buf_len + 1 * sizeof(char));
-	if (!line_cat)
-		return (NULL);
-	while (i < line_len)
+	c_find_pointer = (char *)s;
+	while (*c_find_pointer)
 	{
-		line_cat[i] = old_line[i];
-		i++;
-	}
-	free (old_line);
-	while (i < line_len + buf_len)
-		line_cat[i++] = *buf++;
-	line_cat[i] = '\0';
-	return (line_cat);
-}
-
-// Finds the next iteration of n in line, NULL if not finded
-char	*ft_next_n(char *line)
-{
-	char	*n_find;
-
-	n_find = line;
-	while (*n_find)
-	{
-		if (*n_find == '\n')
-			return (n_find);
-		n_find++;
+		if (*c_find_pointer == '\n')
+			return ((char *)c_find_pointer);
+		c_find_pointer++;
 	}
 	return (NULL);
+}
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*join_string;
+	size_t	len_join_string;
+
+	if (!s1 || !s2)
+		return (NULL);
+	len_join_string = ft_strlen(s1) + ft_strlen(s2) + 1;
+	join_string = malloc(len_join_string);
+	if (!join_string)
+		return (NULL);
+	ft_strlcpy(join_string, s1, ft_strlen(s1) + 1);
+	ft_strlcpy(join_string + ft_strlen(s1), s2, ft_strlen(s2) + 1);
+	return (join_string);
 }

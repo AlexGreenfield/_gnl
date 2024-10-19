@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:15 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/18 17:43:45 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/19 20:53:39 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@
 char	*get_next_line(int fd);
 
 // Utils
-char	*ft_first_read(const char *buf);
-char	*ft_malloc_cat(char *old_line, const char *buf);
-char	*ft_next_n(char *buf);
+size_t	ft_strlen(const char *s);
+size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+char	*ft_strdup(const char *s);
+char	*ft_strchr(const char *s);
+char	*ft_strjoin(char const *s1, char const *s2);
 
 #endif

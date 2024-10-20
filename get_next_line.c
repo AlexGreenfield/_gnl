@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/20 16:10:34 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/20 16:34:43 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,11 @@ int	main(void)
 	printf("Third GNL, He leido esto: %s\n", string);
 	string = get_next_line(fd);
 	printf("\n------\nCall to fourth GNL\n------\n");
-	printf("fourth GNL, He leido esto: %s\n", string);
+	printf("Fourth GNL, He leido esto: %s\n", string);
+	string = get_next_line(fd);
+	printf("\n------\nCall to fith GNL\n------\n");
+	printf("Fith GNL, He leido esto: %s\n", string);
+	free(string);
 	return(0);
 }
 // First, we need to read the file in buf

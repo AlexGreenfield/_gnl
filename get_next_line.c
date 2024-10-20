@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/19 21:52:49 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/20 16:10:34 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 #include <stdio.h> // REMOVE
 #include <string.h>
 
-static char	*ft_fill_line(char *line);
-static char *ft_fill_saved(char *line, char *saved);
+//static char	*ft_fill_line(char *line);
+//static char *ft_fill_saved(char *line, char *saved);
 
 char	*get_next_line(int fd)
 {
@@ -46,11 +46,12 @@ char	*get_next_line(int fd)
 	{
 		printf("Something was saved: %s\n", saved);
 		line_return = ft_strdup(saved);
+		free(saved);
 		printf("After strdup, line should had value: %s\n", line_return);
 		line_return = ft_strjoin(line_return, buf); // We need to fix this
 		printf("After join, line should had value: %s\n", line_return);
 	}
-	else if (!saved)
+	if (!saved)
 		line_return = ft_strdup(buf); // We do our first read of line, cat if theres constan variable char
 	if (!line_return)
 		return (NULL);
@@ -78,7 +79,9 @@ char	*get_next_line(int fd)
 	{
 		printf("I enter n separator\n");
 		saved = ft_strdup(new_n + 1);
-		ft_strlcpy(line_return, line_return, ptr_diff + 1); // Somehow this works
+		if (!saved)
+			return (NULL);
+		ft_strlcpy(line_return, line_return, ptr_diff + 1); // Leak must be after copying line_return
 	}
 	printf("Out of loop, line is: %s \n", line_return);
 	printf("Out of loop, saved is: %s\n\n", saved);

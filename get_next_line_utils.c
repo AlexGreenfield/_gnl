@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/19 21:31:09 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/20 16:07:32 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ char	*ft_strchr(const char *s)
 	}
 	return (NULL);
 }
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*join_string;
 	size_t	len_join_string;
@@ -77,5 +77,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		return (NULL);
 	ft_strlcpy(join_string, s1, ft_strlen(s1) + 1);
 	ft_strlcpy(join_string + ft_strlen(s1), s2, ft_strlen(s2) + 1);
+	free(s1);
 	return (join_string);
 }

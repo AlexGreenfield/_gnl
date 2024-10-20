@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/20 16:34:43 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/20 17:21:04 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,58 +33,35 @@ char	*get_next_line(int fd)
 	if (fd < 0)
 		return (NULL);
 	bytes_readed = read(fd, buf, BUFFER_SIZE); // We read first n bytes
-	if (bytes_readed <= 0 && saved == NULL) // Return if nothing to read
+	if (bytes_readed <= 0) // Return if nothing to read
 		return (NULL);
 	buf[bytes_readed] = '\0';
-
-	printf("Buffer size is = %d\n", BUFFER_SIZE);
-	printf("I readed %zu bytes\n", bytes_readed);
-	printf("First read, buf is: %s\n", buf);
-	printf("First read, saved is: %s\n", saved);
-
 	if (saved)
 	{
-		printf("Something was saved: %s\n", saved);
 		line_return = ft_strdup(saved);
 		free(saved);
-		printf("After strdup, line should had value: %s\n", line_return);
 		line_return = ft_strjoin(line_return, buf); // We need to fix this
-		printf("After join, line should had value: %s\n", line_return);
 	}
 	if (!saved)
 		line_return = ft_strdup(buf); // We do our first read of line, cat if theres constan variable char
 	if (!line_return)
 		return (NULL);
-
-	printf("First read, line is: %s \n\n\n", line_return);
-
 	while (ft_strchr(line_return) == NULL && bytes_readed > 0) // If we didn't reach \n or EOF, we loop
 	{
 		bytes_readed = read(fd, buf, BUFFER_SIZE);
 		buf[bytes_readed] = '\0';
-
-		printf("In Loop, buf is: %s\n", buf);
-
 		line_return = ft_strjoin(line_return, buf);
-
-		printf("In Loop, line is: %s \n\n\n----\n", line_return);
-
 	}
-	new_n = ft_strchr(line_return);
-	ptr_diff= new_n - line_return;
-	printf("After loop, there's n if there's pointer: %s\n", new_n);
-	printf("After loop, diff is: %zu\n", ptr_diff);
-
-	if (new_n != NULL)
+	if (ft_strchr(line_return))
 	{
-		printf("I enter n separator\n");
-		saved = ft_strdup(new_n + 1);
+		new_n = ft_strchr(line_return);
+		new_n++;
+		ptr_diff= new_n - line_return;
+		saved = ft_strdup(new_n);
 		if (!saved)
 			return (NULL);
 		ft_strlcpy(line_return, line_return, ptr_diff + 1); // Leak must be after copying line_return
 	}
-	printf("Out of loop, line is: %s \n", line_return);
-	printf("Out of loop, saved is: %s\n\n", saved);
 	return (line_return);
 }
 
@@ -133,13 +110,13 @@ static char *ft_fill_saved(char *line, char *saved)
 	saved[i] = '\0';
 	return (saved);
 }*/
-
+/*
 int	main(void)
 {
 	int fd;
 	char *string;
 
-	fd = open("../loreipsum.txt", O_RDONLY);
+	fd = open("nl.txt", O_RDONLY);
 	string = get_next_line(fd);
 
 	printf("First gnl, He leido esto: %s\n\n", string);
@@ -159,5 +136,6 @@ int	main(void)
 	free(string);
 	return(0);
 }
+*/
 // First, we need to read the file in buf
-// Then, we copy buff into our static char
+// Then, we copy buff into our static char*/

@@ -6,12 +6,12 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/24 21:10:03 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/24 21:18:18 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
+// Leaks cause not join yet
 static char	*ft_read(int fd, char **saved);
 char	*ft_free(char **to_free, int flag);
 char *ft_split_saved(char **saved);
@@ -77,7 +77,7 @@ char *ft_split_saved(char **saved)
 	char	*temp;
 	char	*line_return;
 
-	next_n = ft_strchr_n(*saved);
+	next_n = ft_strchr_n(*saved); // We need a join if saved left
 	//if (next_n != NULL)
 	//{
 		ptr_diff = next_n - *saved; // We calculate the size to be copied

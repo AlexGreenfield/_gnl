@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/28 18:00:12 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/28 19:28:10 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ char	*get_next_line(int fd)
 		free (saved);
 		saved = NULL;
 		ft_read(fd, &saved);
-		join = ft_strjoin(temp, saved); // May cause leaks? Look for previous version Heres my leak!!
+		join = ft_strjoin(temp, saved); // May cause leaks? Look for previous version
+		free (temp);
+		free (saved);
 		saved = join;
 	}
 	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we must split saved and create line_return. Here's my double free
@@ -44,7 +46,7 @@ char	*get_next_line(int fd)
 		free(saved);
 		saved = NULL;
 	}
-	if (!line_return)
+	if (!line_return && saved)
 		return (ft_free(&saved, 2));
 	return (line_return);
 }
@@ -60,13 +62,13 @@ char	*ft_read(int fd, char **saved)
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
 	if (bytes_readed < 0) // Check for fail, return null
 		return (ft_free(&buf, 0));
-	else if (bytes_readed == 0) // If not bytes readed, free buf and return empty string
-		return (ft_free(&buf, 0));
 	buf[bytes_readed] = '\0'; // Always Null terminate
+	if (bytes_readed == 0) // If not bytes readed, free buf and return empty string
+		return (ft_free(&buf, 1));
+	if (*saved)
+		free(*saved);
 	*saved = ft_strdup(buf); // First fill of saved, check for fail
 	free (buf); // After we used buf, we free it
-	if (!*saved)
-		return (ft_free(saved, 0));
 	return (*saved);
 }
 char *ft_split_saved(char **saved)
@@ -81,12 +83,16 @@ char *ft_split_saved(char **saved)
 	if (!line_return)
 		return (ft_free(saved, 2));
 	free (*saved);
-	*saved = ft_strdup(next_n + 1); // Se save the string after n, CHECK IF VALID
-	if (!*saved)
-		{
-			free(line_return);
-			return (NULL);
-		}
+	*saved = NULL;
+	if (next_n && *(next_n + 1) != '\0')
+	{
+		*saved = ft_strdup(next_n + 1); // Se save the string after n, CHECK IF VALID
+		if (!*saved)
+			{
+				free(line_return);
+				return (NULL);
+			}
+	}
 	return (line_return);
 }
 // Frees pointer direction and returns different values according to flag
@@ -105,7 +111,7 @@ int	main(void)
 	int fd;
 	char *string;
 
-	fd = open("loreipsum_one_jump.txt", O_RDONLY);
+	fd = open("nl.txt", O_RDONLY);
 	string = get_next_line(fd);
 	printf("First gnl, He leido esto: %s", string);
 	string = get_next_line(fd);
@@ -122,4 +128,5 @@ int	main(void)
 	printf("Fith GNL, He leido esto: %s", string);
 	free (string);
 	return(0);
-}*/
+}
+*/

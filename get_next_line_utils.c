@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/28 18:00:40 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/28 19:19:43 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ size_t	ft_strlen(const char *s)
 {
 	size_t	string_size;
 
+	if (!s)
+		return (0);
 	string_size = 0;
 	while (s[string_size] != '\0')
 		string_size++;
@@ -79,8 +81,6 @@ char	*ft_strjoin(char *s1, char *s2)
 	while (s2[j] != '\0')
 		join_string[i++] = s2[j++];
 	join_string[i] = '\0';
-	free(s1);
-	free(s2);
 	return (join_string);
 }
 

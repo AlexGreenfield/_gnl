@@ -6,33 +6,43 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/26 17:15:34 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/28 18:00:12 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-// Leaks cause not join yet
+
 char	*ft_read(int fd, char **saved);
 char	*ft_free(char **to_free, int flag);
-static char *ft_split_saved(char **saved);
+char *ft_split_saved(char **saved);
 
 char	*get_next_line(int fd)
 {
 	static char	*saved;
 	char		*line_return;
+	char		*temp;
+	char		*join;
 
 	if (fd < 0 || BUFFER_SIZE <= 0) // Check for invalid size of not fd
 		return (NULL);
 	if (!saved) // If there's nothing on saved, we read until next n or EOF
 		ft_read(fd, &saved);
 	while (saved && ft_strchr_n(saved) == NULL)
-		saved = ft_strjoin(saved, ft_read(fd, &saved)); // May cause leaks?
-	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we must split saved and create line_return
+	{
+		temp = ft_strdup(saved);
+		free (saved);
+		saved = NULL;
+		ft_read(fd, &saved);
+		join = ft_strjoin(temp, saved); // May cause leaks? Look for previous version Heres my leak!!
+		saved = join;
+	}
+	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we must split saved and create line_return. Here's my double free
 		line_return = ft_split_saved(&saved);
 	else // If there's no N, we return the rest of saved. Now it fails cause of this, we need to read more
 	{
 		line_return = ft_strdup(saved);
-		return (ft_free(&saved, 2));
+		free(saved);
+		saved = NULL;
 	}
 	if (!line_return)
 		return (ft_free(&saved, 2));
@@ -51,28 +61,18 @@ char	*ft_read(int fd, char **saved)
 	if (bytes_readed < 0) // Check for fail, return null
 		return (ft_free(&buf, 0));
 	else if (bytes_readed == 0) // If not bytes readed, free buf and return empty string
-		return (ft_free(&buf, 1));
+		return (ft_free(&buf, 0));
 	buf[bytes_readed] = '\0'; // Always Null terminate
 	*saved = ft_strdup(buf); // First fill of saved, check for fail
+	free (buf); // After we used buf, we free it
 	if (!*saved)
 		return (ft_free(saved, 0));
-	while (bytes_readed > 0 && ft_strchr_n(*saved) == NULL) // If there's saved left, we read
-	{
-		bytes_readed = read(fd, buf, BUFFER_SIZE);
-		if (bytes_readed < 0)
-			return (ft_free(&buf, 0));
-		*saved = ft_strjoin(*saved, buf); // Join for keeping fill saved
-		if (!saved)
-			return (ft_free(saved, 2));
-	}
-	free (buf); // After we used buf, we free it
 	return (*saved);
 }
-static char *ft_split_saved(char **saved)
+char *ft_split_saved(char **saved)
 {
 	size_t	ptr_diff;
 	char	*next_n;
-	char	*temp;
 	char	*line_return;
 
 	next_n = ft_strchr_n(*saved); // We need a join if saved left
@@ -80,11 +80,13 @@ static char *ft_split_saved(char **saved)
 	line_return = ft_substr(*saved, 0, ptr_diff + 1); // We make a new string from actual string to n
 	if (!line_return)
 		return (ft_free(saved, 2));
-	temp = ft_strdup(next_n + 1); // Se save the string after n
 	free (*saved);
-	*saved = temp;
+	*saved = ft_strdup(next_n + 1); // Se save the string after n, CHECK IF VALID
 	if (!*saved)
-		return (ft_free(saved, 2));
+		{
+			free(line_return);
+			return (NULL);
+		}
 	return (line_return);
 }
 // Frees pointer direction and returns different values according to flag
@@ -97,3 +99,27 @@ char	*ft_free(char **to_free, int flag)
 		*to_free = NULL;
 	return (NULL);
 }
+/*
+int	main(void)
+{
+	int fd;
+	char *string;
+
+	fd = open("loreipsum_one_jump.txt", O_RDONLY);
+	string = get_next_line(fd);
+	printf("First gnl, He leido esto: %s", string);
+	string = get_next_line(fd);
+	printf("------\nCall to second GNL\n------\n");
+	printf("Second GNL, He leido esto: %s", string);
+	string = get_next_line(fd);
+	printf("------\nCall to third GNL\n------\n");
+	printf("Third GNL, He leido esto: %s", string);
+	string = get_next_line(fd);
+	printf("------\nCall to fourth GNL\n------\n");
+	printf("Fourth GNL, He leido esto: %s", string);
+	string = get_next_line(fd);
+	printf("------\nCall to fith GNL\n------\n");
+	printf("Fith GNL, He leido esto: %s", string);
+	free (string);
+	return(0);
+}*/

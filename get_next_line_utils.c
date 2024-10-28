@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/24 18:39:48 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/28 18:00:40 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ char	*ft_strjoin(char *s1, char *s2)
 		join_string[i++] = s2[j++];
 	join_string[i] = '\0';
 	free(s1);
+	free(s2);
 	return (join_string);
 }
 

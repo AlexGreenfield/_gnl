@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
+// Calculates size of str
 size_t	ft_strlen(const char *s)
 {
 	size_t	string_size;
@@ -23,7 +23,7 @@ size_t	ft_strlen(const char *s)
 		string_size++;
 	return (string_size);
 }
-
+// Searchs for n and returns pointer
 char	*ft_strchr_n(const char *s)
 {
 	char	*c_find_pointer;
@@ -57,7 +57,7 @@ char	*ft_strdup(const char *s)
 		new_string[sl] = s[sl];
 	return (new_string);
 }
-
+// Join two different strings on a new one via malloc
 char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*join_string;
@@ -83,7 +83,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	join_string[i] = '\0';
 	return (join_string);
 }
-
+// Creates a substring of s from start position to n len bytes
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*sub_string;

@@ -85,7 +85,7 @@ char *ft_split_saved(char **saved)
 		return (ft_free(saved, 2));
 	free (*saved);
 	*saved = NULL;
-	if (next_n && *(next_n + 1) != '\0') // Check fot n right before EOF
+	if (next_n && *(next_n + 1) != '\0') // Check fot n right before EOF, reference to next_n is lost in free saved
 	{
 		*saved = ft_strdup(next_n + 1); // We store in saved everything after n
 		if (!*saved) // Malloc check
@@ -106,13 +106,13 @@ char	*ft_free(char **to_free, int flag)
 		*to_free = NULL;
 	return (NULL);
 }
-/*
+
 int	main(void)
 {
 	int fd;
 	char *string;
 
-	fd = open("nl.txt", O_RDONLY);
+	fd = open("loreipsum.txt", O_RDONLY);
 	string = get_next_line(fd);
 	printf("First gnl, He leido esto: %s", string);
 	string = get_next_line(fd);
@@ -130,4 +130,3 @@ int	main(void)
 	free (string);
 	return(0);
 }
-*/

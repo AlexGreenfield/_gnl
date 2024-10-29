@@ -6,15 +6,15 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/29 20:29:12 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/29 21:41:57 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_read(int fd, char **saved);
+ssize_t	ft_read(int fd, char **saved);
 char	*ft_free(char **to_free, int flag);
-char *ft_split_saved(char **saved);
+char	*ft_split_saved(char **saved);
 // Reads and saves text to a file until n, returns line and stores next for future calls
 char	*get_next_line(int fd)
 {
@@ -22,17 +22,23 @@ char	*get_next_line(int fd)
 	char		*line_return; // Line to return to user
 	char		*temp; // Temp to store and free saved str, used in join
 	char		*join; // Temp to store joined str
+	ssize_t		bytes_readed;
 
 	if (fd < 0 || BUFFER_SIZE <= 0) // Check for invalid size of not fd
 		return (NULL);
 	if (!saved) // If there's nothing on saved, we read until next n or EOF
-		ft_read(fd, &saved);
-	while (saved != NULL && ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly here carefull
+		bytes_readed = ft_read(fd, &saved);
+	while ((saved != NULL || bytes_readed > 0)&& ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly if 0 bytes readed carefull
 	{
 		temp = ft_strdup(saved);  // Temp for storing saved string in new pointer address
 		free (saved); // Free saved to avoid leaks, it holds the same value as join
 		saved = NULL; // Null for ptr handling
-		ft_read(fd, &saved); // Read file for n bytes
+		bytes_readed = ft_read(fd, &saved); // Read file for n bytes
+		if (bytes_readed == 0)
+		{
+			saved = temp;
+			break;
+		}
 		join = ft_strjoin(temp, saved); // Add new str readed to what we've saved
 		free (temp);
 		free (saved);
@@ -51,23 +57,26 @@ char	*get_next_line(int fd)
 	return (line_return);
 }
 // Reads n bytes in buffer and stores it in saved
-char	*ft_read(int fd, char **saved)
+ssize_t	ft_read(int fd, char **saved)
 {
 	ssize_t	bytes_readed;
 	char	*buf;
 
 	buf = malloc(BUFFER_SIZE + 1); // We alloc buffer for n bytes to read
 	if (!buf)
-		return(NULL);
+		return(0);
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
 	if (bytes_readed < 0) // Check for fail, return null
-		return (ft_free(&buf, 0));
-	/*if (bytes_readed == 0) // If not bytes readed, free buf and return empty string. Heres problem
 	{
 		free(buf);
-		*saved = ft_strdup("");
-		return (*saved);
-	}*/
+		return(0);
+	}
+		//return (ft_free(&buf, 0));
+	if (bytes_readed == 0) // If not bytes readed, free buf and return empty string. Here's my problem, if saved is null, then will null join and return null
+	{
+		free(buf);
+		return (0);
+	}
 	buf[bytes_readed] = '\0'; // Always Null terminate
 	if (*saved)
 	{
@@ -76,7 +85,7 @@ char	*ft_read(int fd, char **saved)
 	}
 	*saved = ft_strdup(buf);
 	free (buf); // After we used buf, we free it
-	return (*saved);
+	return (bytes_readed);
 }
 // If n, divides saved in two : the line to return before n and new saved after n
 char *ft_split_saved(char **saved)
@@ -127,7 +136,7 @@ int	main(void)
 	int fd;
 	char *string;
 
-	fd = open("41_no_nl.txt", O_RDONLY);
+	fd = open("41_no_nl", O_RDONLY);
 	string = get_next_line(fd);
 	printf("First gnl, He leido esto: %s", string);
 	string = get_next_line(fd);
@@ -144,5 +153,4 @@ int	main(void)
 	printf("Fith GNL, He leido esto: %s", string);
 	free (string);
 	return(0);
-}
-*/
+}*/

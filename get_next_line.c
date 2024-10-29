@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/28 19:28:10 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/29 20:29:12 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!saved) // If there's nothing on saved, we read until next n or EOF
 		ft_read(fd, &saved);
-	while (saved && ft_strchr_n(saved) == NULL) // We store until n or EOF
+	while (saved != NULL && ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly here carefull
 	{
 		temp = ft_strdup(saved);  // Temp for storing saved string in new pointer address
 		free (saved); // Free saved to avoid leaks, it holds the same value as join
 		saved = NULL; // Null for ptr handling
 		ft_read(fd, &saved); // Read file for n bytes
 		join = ft_strjoin(temp, saved); // Add new str readed to what we've saved
-		free (temp); 
+		free (temp);
 		free (saved);
-		saved = join; 
+		saved = join;
 	}
 	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we split saved and create line_return.
 		line_return = ft_split_saved(&saved);
@@ -62,12 +62,19 @@ char	*ft_read(int fd, char **saved)
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
 	if (bytes_readed < 0) // Check for fail, return null
 		return (ft_free(&buf, 0));
+	/*if (bytes_readed == 0) // If not bytes readed, free buf and return empty string. Heres problem
+	{
+		free(buf);
+		*saved = ft_strdup("");
+		return (*saved);
+	}*/
 	buf[bytes_readed] = '\0'; // Always Null terminate
-	if (bytes_readed == 0) // If not bytes readed, free buf and return empty string
-		return (ft_free(&buf, 1));
 	if (*saved)
+	{
 		free(*saved); // Not null reset, may be an issue?
-	*saved = ft_strdup(buf); 
+		*saved = NULL;
+	}
+	*saved = ft_strdup(buf);
 	free (buf); // After we used buf, we free it
 	return (*saved);
 }
@@ -77,22 +84,30 @@ char *ft_split_saved(char **saved)
 	size_t	ptr_diff; // N bytes to copy with substr
 	char	*next_n; // Pointer to next n
 	char	*line_return;
+	char	*temp;
 
 	next_n = ft_strchr_n(*saved); // We find n
 	ptr_diff = next_n - *saved; // We calculate the size to be copied
 	line_return = ft_substr(*saved, 0, ptr_diff + 1); // We make a new string from actual string to n
 	if (!line_return) // Malloc check
 		return (ft_free(saved, 2));
-	free (*saved);
-	*saved = NULL;
+
 	if (next_n && *(next_n + 1) != '\0') // Check fot n right before EOF, reference to next_n is lost in free saved
 	{
-		*saved = ft_strdup(next_n + 1); // We store in saved everything after n
+		temp = ft_strdup(next_n + 1);
+		*saved = NULL;
+		free (*saved);
+		*saved = temp;
 		if (!*saved) // Malloc check
 			{
 				free(line_return);
 				return (NULL);
 			}
+	}
+	else
+	{
+		free(*saved);
+		*saved = NULL;
 	}
 	return (line_return);
 }
@@ -106,13 +121,13 @@ char	*ft_free(char **to_free, int flag)
 		*to_free = NULL;
 	return (NULL);
 }
-
+/*
 int	main(void)
 {
 	int fd;
 	char *string;
 
-	fd = open("loreipsum.txt", O_RDONLY);
+	fd = open("41_no_nl.txt", O_RDONLY);
 	string = get_next_line(fd);
 	printf("First gnl, He leido esto: %s", string);
 	string = get_next_line(fd);
@@ -130,3 +145,4 @@ int	main(void)
 	free (string);
 	return(0);
 }
+*/

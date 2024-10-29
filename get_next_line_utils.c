@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/28 19:19:43 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/29 20:04:23 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ char	*ft_strdup(const char *s)
 {
 	char	*new_string;
 	size_t	sl;
+	size_t	i;
 
 	if (!s)
 		return (NULL);
@@ -52,9 +53,13 @@ char	*ft_strdup(const char *s)
 	new_string = malloc(sl + 1);
 	if (new_string == NULL)
 		return (NULL);
-	new_string[sl] = '\0';
-	while (sl--)
-		new_string[sl] = s[sl];
+	i = 0;
+	while (i < sl)
+	{
+		new_string[i] = s[i];
+		i++;
+	}
+	new_string[i] = '\0';
 	return (new_string);
 }
 // Join two different strings on a new one via malloc

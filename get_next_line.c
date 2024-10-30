@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/29 21:41:57 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/30 18:48:24 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!saved) // If there's nothing on saved, we read until next n or EOF
 		bytes_readed = ft_read(fd, &saved);
-	while ((saved != NULL || bytes_readed > 0)&& ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly if 0 bytes readed carefull
+	while ((saved != NULL || bytes_readed > 0) && ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly if 0 bytes readed carefull
 	{
 		temp = ft_strdup(saved);  // Temp for storing saved string in new pointer address
 		free (saved); // Free saved to avoid leaks, it holds the same value as join
@@ -46,7 +46,7 @@ char	*get_next_line(int fd)
 	}
 	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we split saved and create line_return.
 		line_return = ft_split_saved(&saved);
-	else // If there's no N, we return the rest of saved.
+	else// If there's no N, we return the rest of saved.
 	{
 		line_return = ft_strdup(saved);
 		free(saved);
@@ -66,18 +66,17 @@ ssize_t	ft_read(int fd, char **saved)
 	if (!buf)
 		return(0);
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
-	if (bytes_readed < 0) // Check for fail, return null
+	if (bytes_readed < 0) // Check for fail, need to make exception for this
 	{
 		free(buf);
 		return(0);
 	}
-		//return (ft_free(&buf, 0));
+	buf[bytes_readed] = '\0'; // Always Null terminate
 	if (bytes_readed == 0) // If not bytes readed, free buf and return empty string. Here's my problem, if saved is null, then will null join and return null
 	{
 		free(buf);
 		return (0);
 	}
-	buf[bytes_readed] = '\0'; // Always Null terminate
 	if (*saved)
 	{
 		free(*saved); // Not null reset, may be an issue?
@@ -101,10 +100,9 @@ char *ft_split_saved(char **saved)
 	if (!line_return) // Malloc check
 		return (ft_free(saved, 2));
 
-	if (next_n && *(next_n + 1) != '\0') // Check fot n right before EOF, reference to next_n is lost in free saved
+	if (*next_n && *(next_n + 1) != '\0') // Check fot n right before EOF, reference to next_n is lost in free saved
 	{
 		temp = ft_strdup(next_n + 1);
-		*saved = NULL;
 		free (*saved);
 		*saved = temp;
 		if (!*saved) // Malloc check
@@ -136,7 +134,7 @@ int	main(void)
 	int fd;
 	char *string;
 
-	fd = open("41_no_nl", O_RDONLY);
+	fd = open("41_with_nl", O_RDONLY);
 	string = get_next_line(fd);
 	printf("First gnl, He leido esto: %s", string);
 	string = get_next_line(fd);

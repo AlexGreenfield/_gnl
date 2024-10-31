@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/30 21:28:54 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/31 16:43:34 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,13 @@ char	*get_next_line(int fd)
 	while (saved != NULL && ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly if 0 bytes readed carefull
 	{
 		bytes_readed = ft_keep_reading(fd, &saved);
-		if (bytes_readed <= 0) // Checks for 0 or error, if error maybe we should return null
+		if (bytes_readed <= 0) // Checks for 0 or error, if error should return null!!! Only paco test that fails
 			break;
+	}
+	if (bytes_readed < 0)
+	{
+		ft_free_fill_saved(&saved, NULL);
+		return (NULL);
 	}
 	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we split saved and create line_return.
 		line_return = ft_split_saved(&saved);
@@ -62,7 +67,7 @@ ssize_t	ft_read(int fd, char **saved)
 	if (bytes_readed <= 0) // Check for fail, need to make exception for this
 	{
 		free(buf);
-		return(0);
+		return(bytes_readed);
 	}
 	buf[bytes_readed] = '\0'; // Always Null terminate
 	if (*saved)
@@ -115,6 +120,7 @@ char *ft_split_saved(char **saved)
 		if (!*saved) // Malloc check
 			{
 				free(line_return); // Ask for free and null
+				ft_free_fill_saved(saved, NULL);
 				return (NULL);
 			}
 	}

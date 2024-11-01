@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:15 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/29 21:58:41 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/01 18:00:41 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,5 @@ char	*ft_strdup(const char *s);
 char	*ft_strchr_n(const char *s);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-
 
 #endif

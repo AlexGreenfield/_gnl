@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:22 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/29 21:12:44 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/10/31 16:48:09 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ size_t	ft_strlen(const char *s)
 		string_size++;
 	return (string_size);
 }
+
 // Searchs for n and returns pointer
 char	*ft_strchr_n(const char *s)
 {
@@ -62,6 +63,7 @@ char	*ft_strdup(const char *s)
 	new_string[i] = '\0';
 	return (new_string);
 }
+
 // Join two different strings on a new one via malloc
 char	*ft_strjoin(char *s1, char *s2)
 {
@@ -88,6 +90,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	join_string[i] = '\0';
 	return (join_string);
 }
+
 // Creates a substring of s from start position to n len bytes
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {

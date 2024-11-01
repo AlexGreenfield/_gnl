@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/10/31 16:43:34 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/01 18:49:21 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,7 @@
 
 ssize_t	ft_read(int fd, char **saved);
 ssize_t	ft_keep_reading(int fd, char **saved);
-char	*ft_free(char **to_free, int flag);
 char	*ft_split_saved(char **saved);
-void	ft_free_null_saved(char **saved);
 void	ft_free_fill_saved(char **saved, char *fill);
 
 
@@ -51,7 +49,7 @@ char	*get_next_line(int fd)
 		ft_free_fill_saved (&saved, NULL); // Null reset for next call to GNL, fill version works for simplicity but I need to check if its valid
 	}
 	if (!line_return && saved) // Malloc check
-			ft_free_null_saved (&saved); // Same, check for fill version
+			ft_free_fill_saved (&saved, NULL); // Same, check for fill version
 	return (line_return);
 }
 // Reads n bytes in buffer and stores it in saved
@@ -62,7 +60,7 @@ ssize_t	ft_read(int fd, char **saved)
 
 	buf = malloc(BUFFER_SIZE + 1); // We alloc buffer for n bytes to read
 	if (!buf)
-		return(0);
+		return(-1);
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
 	if (bytes_readed <= 0) // Check for fail, need to make exception for this
 	{
@@ -74,6 +72,11 @@ ssize_t	ft_read(int fd, char **saved)
 		ft_free_fill_saved (saved, NULL);
 	*saved = ft_strdup(buf);
 	free (buf); // After we used buf, we free it
+	if (!*saved)
+	{
+		ft_free_fill_saved (saved, NULL);
+		return(-1);
+	}
 	return (bytes_readed);
 }
 ssize_t	ft_keep_reading(int fd, char **saved)
@@ -83,7 +86,12 @@ ssize_t	ft_keep_reading(int fd, char **saved)
 	ssize_t	bytes_readed;
 
 	temp = ft_strdup(*saved);  // Temp for storing saved string in new pointer address
-	ft_free_null_saved (saved);
+	if (!temp)
+	{
+		free (temp);
+		return (-1);
+	}
+	ft_free_fill_saved (saved, NULL);
 	bytes_readed = ft_read(fd, saved); // Read file for n bytes
 	if (bytes_readed <= 0)
 	{
@@ -94,56 +102,40 @@ ssize_t	ft_keep_reading(int fd, char **saved)
 	free (temp);
 	free (*saved);
 	*saved = join;
+	if (!*saved)
+		return (-1);
 	return (bytes_readed);
 }
 // If n, divides saved in two : the line to return before n and new saved after n
 char *ft_split_saved(char **saved)
 {
-	size_t	ptr_diff; // N bytes to copy with substr
 	char	*next_n; // Pointer to next n
 	char	*line_return;
 	char	*temp;
 
 	next_n = ft_strchr_n(*saved); // We find n
-	ptr_diff = next_n - *saved; // We calculate the size to be copied
-	line_return = ft_substr(*saved, 0, ptr_diff + 1); // We make a new string from actual string to n
+	line_return = ft_substr(*saved, 0, next_n - *saved + 1); // We make a new string from actual string to n
 	if (!line_return) // Malloc check
 		{
-			ft_free_null_saved (saved); // Ask for free and null
+			ft_free_fill_saved (saved, NULL); // Ask for free and null
 			return (NULL);
 		}
-	if (*next_n && *(next_n + 1) != '\0') // Check fot n right before EOF, reference to next_n is lost in free saved
+	if (*next_n && *(next_n + 1)) // Check fot n right before EOF, reference to next_n is lost in free saved
 	{
 		temp = ft_strdup(next_n + 1);
-		free (*saved);
-		*saved = temp;
+		ft_free_fill_saved(saved, temp);
 		if (!*saved) // Malloc check
 			{
-				free(line_return); // Ask for free and null
-				ft_free_fill_saved(saved, NULL);
+				free (line_return); // Ask for free and null
+				ft_free_fill_saved (saved, NULL);
 				return (NULL);
 			}
 	}
 	else
-		ft_free_null_saved (saved);
+		ft_free_fill_saved (saved, NULL);
 	return (line_return);
 }
 // Frees pointer direction and returns different values according to flag. Right now it has no use
-char	*ft_free(char **to_free, int flag)
-{
-	free(*to_free);
-	if (flag == 1) // If empty saved, we return empty string
-		return (ft_strdup(""));
-	if (flag == 2) // If freeing saved, we must assign NULL value
-		*to_free = NULL;
-	return (NULL);
-}
-
-void	ft_free_null_saved(char **saved) // Maybe be deprecated by fill version
-{
-	free (*saved);
-	*saved = NULL;
-}
 
 void	ft_free_fill_saved(char **saved, char *fill) // If this is legit with NULL, use it for every call of saved
 {

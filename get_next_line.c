@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/01 18:49:21 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/01 19:31:18 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 ssize_t	ft_read(int fd, char **saved);
 ssize_t	ft_keep_reading(int fd, char **saved);
 char	*ft_split_saved(char **saved);
+char	*get_return_line(char **saved);
 void	ft_free_fill_saved(char **saved, char *fill);
 
 
@@ -41,15 +42,7 @@ char	*get_next_line(int fd)
 		ft_free_fill_saved(&saved, NULL);
 		return (NULL);
 	}
-	if (ft_strchr_n(saved) != NULL) // If there's N in saved, we split saved and create line_return.
-		line_return = ft_split_saved(&saved);
-	else// If there's no N, we return the rest of saved.
-	{
-		line_return = ft_strdup(saved);
-		ft_free_fill_saved (&saved, NULL); // Null reset for next call to GNL, fill version works for simplicity but I need to check if its valid
-	}
-	if (!line_return && saved) // Malloc check
-			ft_free_fill_saved (&saved, NULL); // Same, check for fill version
+	line_return = get_return_line(&saved);
 	return (line_return);
 }
 // Reads n bytes in buffer and stores it in saved
@@ -135,7 +128,21 @@ char *ft_split_saved(char **saved)
 		ft_free_fill_saved (saved, NULL);
 	return (line_return);
 }
-// Frees pointer direction and returns different values according to flag. Right now it has no use
+char	*get_return_line(char **saved)
+{
+	char	*line_return;
+
+	if (ft_strchr_n(*saved) != NULL) // If there's N in saved, we split saved and create line_return.
+		line_return = ft_split_saved(saved);
+	else// If there's no N, we return the rest of saved.
+	{
+		line_return = ft_strdup(*saved);
+		ft_free_fill_saved (saved, NULL); // Null reset for next call to GNL, fill version works for simplicity but I need to check if its valid
+	}
+	if (!line_return && *saved) // Malloc check
+			ft_free_fill_saved (saved, NULL); // Same, check for fill version
+	return (line_return);
+}
 
 void	ft_free_fill_saved(char **saved, char *fill) // If this is legit with NULL, use it for every call of saved
 {

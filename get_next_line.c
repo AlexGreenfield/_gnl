@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/01 19:31:18 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/02 12:38:59 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,137 +15,122 @@
 ssize_t	ft_read(int fd, char **saved);
 ssize_t	ft_keep_reading(int fd, char **saved);
 char	*ft_split_saved(char **saved);
-char	*get_return_line(char **saved);
-void	ft_free_fill_saved(char **saved, char *fill);
+char	*get_return_line(char **saved, ssize_t bytes_readed);
 
-
-// Reads and saves text to a file until n, returns line and stores next for future calls
+// Reads and saves of a file until n, returns line and stores rest for next calls
 char	*get_next_line(int fd)
 {
 	static char	*saved; // Static char to store everything read until n
 	char		*line_return; // Line to return to user
-	ssize_t		bytes_readed;
+	ssize_t		bytes_readed; // Number of bytes readed
 
 	bytes_readed = 0;
-	if (fd < 0 || BUFFER_SIZE <= 0) // Check for invalid size of not fd
+	if (fd < 0 || BUFFER_SIZE <= 0) // Check for invalid size or no valid fd
 		return (NULL);
-	if (!saved) // If there's nothing on saved, we read until next n or EOF
+	if (!saved) // If there's nothing in saved, we read until the next n or EOF
 		bytes_readed = ft_read(fd, &saved);
-	while (saved != NULL && ft_strchr_n(saved) == NULL) // We store until n or EOF, I loop indefinetly if 0 bytes readed carefull
+	while (saved != NULL && ft_strchr_n(saved) == NULL) // Store until n or EOF
 	{
 		bytes_readed = ft_keep_reading(fd, &saved);
-		if (bytes_readed <= 0) // Checks for 0 or error, if error should return null!!! Only paco test that fails
-			break;
+		if (bytes_readed <= 0) // Check for 0 bytes read of -1 if anything fails
+			break ;
 	}
-	if (bytes_readed < 0)
-	{
-		ft_free_fill_saved(&saved, NULL);
-		return (NULL);
-	}
-	line_return = get_return_line(&saved);
+	line_return = get_return_line(&saved, bytes_readed); // After reading, we gen our line
 	return (line_return);
 }
-// Reads n bytes in buffer and stores it in saved
+
+// Reads n bytes into a buffer and stores it in saved
 ssize_t	ft_read(int fd, char **saved)
 {
 	ssize_t	bytes_readed;
 	char	*buf;
 
-	buf = malloc(BUFFER_SIZE + 1); // We alloc buffer for n bytes to read
-	if (!buf)
-		return(-1);
+	buf = malloc(BUFFER_SIZE + 1); // Allocate buffer for n bytes to read
+	if (!buf) // If it fails, return -1 and free saved on gnl
+		return (-1);
 	bytes_readed = read(fd, buf, BUFFER_SIZE);
-	if (bytes_readed <= 0) // Check for fail, need to make exception for this
+	if (bytes_readed <= 0) // Free buffer on read error or no bytes read
 	{
 		free(buf);
-		return(bytes_readed);
+		return (bytes_readed);
 	}
-	buf[bytes_readed] = '\0'; // Always Null terminate
-	if (*saved)
-		ft_free_fill_saved (saved, NULL);
-	*saved = ft_strdup(buf);
-	free (buf); // After we used buf, we free it
-	if (!*saved)
-	{
-		ft_free_fill_saved (saved, NULL);
-		return(-1);
-	}
+	buf[bytes_readed] = '\0'; // Always null-terminate
+	*saved = ft_strdup(buf); // We copy buf into saved
+	free (buf); // Free buffer after use
+	if (!*saved) // Check for malloc failure in ft_strdup
+		return (-1);
 	return (bytes_readed);
 }
+
 ssize_t	ft_keep_reading(int fd, char **saved)
 {
-	char	*temp; // Temp to store and free saved str, used in join
-	char	*join; // Temp to store joined str
+	char	*temp; // Temp to store saved string for joining
+	char	*join; // Temp to store joined string
 	ssize_t	bytes_readed;
 
-	temp = ft_strdup(*saved);  // Temp for storing saved string in new pointer address
-	if (!temp)
-	{
-		free (temp);
-		return (-1);
-	}
-	ft_free_fill_saved (saved, NULL);
+	temp = ft_strdup(*saved);  // Store saved in new pointer address
+	free (*saved); // Free saved to avoid leaks
+	*saved = NULL; // Always NULL saved after freeing it
 	bytes_readed = ft_read(fd, saved); // Read file for n bytes
-	if (bytes_readed <= 0)
+	if (bytes_readed <= 0) // On error or EOF, restore temp to saved
 	{
 		*saved = temp;
 		return (bytes_readed);
 	}
-	join = ft_strjoin(temp, *saved); // Add new str readed to what we've saved
-	free (temp);
+	join = ft_strjoin(temp, *saved); // Append new string to saved
+	free (temp); // Free temp and saved to avoid leaks
 	free (*saved);
-	*saved = join;
-	if (!*saved)
+	*saved = join; // Update saved with joined result
+	if (!*saved) // Check for malloc failure
 		return (-1);
 	return (bytes_readed);
 }
-// If n, divides saved in two : the line to return before n and new saved after n
-char *ft_split_saved(char **saved)
+
+// If n exists in saved, splits saved into two parts: before and after n
+char	*ft_split_saved(char **saved)
 {
 	char	*next_n; // Pointer to next n
-	char	*line_return;
-	char	*temp;
+	char	*line_return; // Line to return
+	char	*temp; // Temp to store saved
 
-	next_n = ft_strchr_n(*saved); // We find n
-	line_return = ft_substr(*saved, 0, next_n - *saved + 1); // We make a new string from actual string to n
-	if (!line_return) // Malloc check
-		{
-			ft_free_fill_saved (saved, NULL); // Ask for free and null
-			return (NULL);
-		}
-	if (*next_n && *(next_n + 1)) // Check fot n right before EOF, reference to next_n is lost in free saved
+	next_n = ft_strchr_n(*saved); // Find n
+	line_return = ft_substr(*saved, 0, next_n - *saved + 1); // New string from start to n, + 1 for \0
+	if (*next_n && *(next_n + 1)) // Check in case n is right before EOF
 	{
-		temp = ft_strdup(next_n + 1);
-		ft_free_fill_saved(saved, temp);
-		if (!*saved) // Malloc check
-			{
-				free (line_return); // Ask for free and null
-				ft_free_fill_saved (saved, NULL);
-				return (NULL);
-			}
+		temp = ft_strdup(next_n + 1); // Copy remaining string after n
+		free (*saved); // Free saved to avoid leaks
+		*saved = temp; // We update our saved string
 	}
 	else
-		ft_free_fill_saved (saved, NULL);
+	{
+		free (*saved); // If there's nothing remaining after n; reset saved
+		*saved = NULL; // Always NULL saved after freeing it for future calls to GNL
+	}
 	return (line_return);
 }
-char	*get_return_line(char **saved)
+
+char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
 	char	*line_return;
 
-	if (ft_strchr_n(*saved) != NULL) // If there's N in saved, we split saved and create line_return.
+	if (bytes_readed < 0) // If anything fails (read or malloc), frees saved
+	{
+		free (*saved);
+		*saved = NULL;
+		return (NULL);
+	}
+	if (ft_strchr_n(*saved) != NULL) // If n exists in saved, split saved and return line
 		line_return = ft_split_saved(saved);
-	else// If there's no N, we return the rest of saved.
+	else // If no n, return the rest of saved
 	{
 		line_return = ft_strdup(*saved);
-		ft_free_fill_saved (saved, NULL); // Null reset for next call to GNL, fill version works for simplicity but I need to check if its valid
+		free (*saved); // Always free saved to avoid leaks
+		*saved = NULL; // Reset for next call to GNL
 	}
-	if (!line_return && *saved) // Malloc check
-			ft_free_fill_saved (saved, NULL); // Same, check for fill version
+	if (!line_return && *saved) // Check for malloc failure in any previous step
+	{
+		free (*saved);
+		*saved = NULL;
+	}
 	return (line_return);
-}
-
-void	ft_free_fill_saved(char **saved, char *fill) // If this is legit with NULL, use it for every call of saved
-{
-	free (*saved);
-	*saved = fill;
 }

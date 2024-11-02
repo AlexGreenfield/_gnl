@@ -6,16 +6,16 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/02 12:35:42 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/02 14:24:44 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-ssize_t	ft_read(int fd, char **saved);
-ssize_t	ft_keep_reading(int fd, char **saved);
-char	*ft_split_saved(char **saved);
-char	*get_return_line(char **saved, ssize_t bytes_readed);
+static ssize_t	ft_read(int fd, char **saved);
+static ssize_t	ft_keep_reading(int fd, char **saved);
+static char		*ft_split_saved(char **saved);
+static char		*get_return_line(char **saved, ssize_t bytes_readed);
 
 // Reads and saves until n, returns line and stores for future calls
 char	*get_next_line(int fd)
@@ -40,7 +40,7 @@ char	*get_next_line(int fd)
 }
 
 // Reads n bytes in buffer and stores it in saved
-ssize_t	ft_read(int fd, char **saved)
+static ssize_t	ft_read(int fd, char **saved)
 {
 	ssize_t	bytes_readed;
 	char	*buf;
@@ -62,7 +62,7 @@ ssize_t	ft_read(int fd, char **saved)
 	return (bytes_readed);
 }
 
-ssize_t	ft_keep_reading(int fd, char **saved)
+static ssize_t	ft_keep_reading(int fd, char **saved)
 {
 	char	*temp;
 	char	*join;
@@ -87,7 +87,7 @@ ssize_t	ft_keep_reading(int fd, char **saved)
 }
 
 // Divides saved in two after and before n
-char	*ft_split_saved(char **saved)
+static char	*ft_split_saved(char **saved)
 {
 	char	*next_n;
 	char	*line_return;
@@ -109,7 +109,7 @@ char	*ft_split_saved(char **saved)
 	return (line_return);
 }
 
-char	*get_return_line(char **saved, ssize_t bytes_readed)
+static char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
 	char	*line_return;
 

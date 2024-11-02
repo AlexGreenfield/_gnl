@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/01 19:42:22 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/02 11:50:23 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ ssize_t	ft_read(int fd, char **saved);
 ssize_t	ft_keep_reading(int fd, char **saved);
 char	*ft_split_saved(char **saved);
 char	*get_return_line(char **saved);
-void	ft_free_fill_saved(char **saved, char *fill);
 
 // Reads and saves until n, returns line and stores for future calls
 char	*get_next_line(int fd)
@@ -38,7 +37,8 @@ char	*get_next_line(int fd)
 	}
 	if (bytes_readed < 0)
 	{
-		ft_free_fill_saved(&saved, NULL);
+		free (saved);
+		saved = NULL;
 		return (NULL);
 	}
 	line_return = get_return_line(&saved);
@@ -61,15 +61,10 @@ ssize_t	ft_read(int fd, char **saved)
 		return (bytes_readed);
 	}
 	buf[bytes_readed] = '\0';
-	if (*saved)
-		ft_free_fill_saved (saved, NULL);
 	*saved = ft_strdup(buf);
 	free (buf);
 	if (!*saved)
-	{
-		ft_free_fill_saved (saved, NULL);
 		return (-1);
-	}
 	return (bytes_readed);
 }
 
@@ -80,12 +75,8 @@ ssize_t	ft_keep_reading(int fd, char **saved)
 	ssize_t	bytes_readed;
 
 	temp = ft_strdup(*saved);
-	if (!temp)
-	{
-		free (temp);
-		return (-1);
-	}
-	ft_free_fill_saved (saved, NULL);
+	free (*saved);
+	*saved = NULL;
 	bytes_readed = ft_read(fd, saved);
 	if (bytes_readed <= 0)
 	{
@@ -110,24 +101,17 @@ char	*ft_split_saved(char **saved)
 
 	next_n = ft_strchr_n(*saved);
 	line_return = ft_substr(*saved, 0, next_n - *saved + 1);
-	if (!line_return)
-	{
-		ft_free_fill_saved (saved, NULL);
-		return (NULL);
-	}
 	if (*next_n && *(next_n + 1))
 	{
 		temp = ft_strdup(next_n + 1);
-		ft_free_fill_saved(saved, temp);
-		if (!*saved)
-		{
-			free (line_return);
-			ft_free_fill_saved (saved, NULL);
-			return (NULL);
-		}
+		free (*saved);
+		*saved = temp;
 	}
 	else
-		ft_free_fill_saved (saved, NULL);
+	{
+		free (*saved);
+		*saved = NULL;
+	}
 	return (line_return);
 }
 
@@ -140,15 +124,13 @@ char	*get_return_line(char **saved)
 	else
 	{
 		line_return = ft_strdup(*saved);
-		ft_free_fill_saved (saved, NULL);
+		free (*saved);
+		*saved = NULL;
 	}
 	if (!line_return && *saved)
-		ft_free_fill_saved (saved, NULL);
+	{
+		free (*saved);
+		*saved = NULL;
+	}
 	return (line_return);
-}
-
-void	ft_free_fill_saved(char **saved, char *fill)
-{
-	free (*saved);
-	*saved = fill;
 }

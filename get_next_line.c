@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/02 11:50:23 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/02 12:35:42 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 ssize_t	ft_read(int fd, char **saved);
 ssize_t	ft_keep_reading(int fd, char **saved);
 char	*ft_split_saved(char **saved);
-char	*get_return_line(char **saved);
+char	*get_return_line(char **saved, ssize_t bytes_readed);
 
 // Reads and saves until n, returns line and stores for future calls
 char	*get_next_line(int fd)
@@ -35,13 +35,7 @@ char	*get_next_line(int fd)
 		if (bytes_readed <= 0)
 			break ;
 	}
-	if (bytes_readed < 0)
-	{
-		free (saved);
-		saved = NULL;
-		return (NULL);
-	}
-	line_return = get_return_line(&saved);
+	line_return = get_return_line(&saved, bytes_readed);
 	return (line_return);
 }
 
@@ -115,10 +109,16 @@ char	*ft_split_saved(char **saved)
 	return (line_return);
 }
 
-char	*get_return_line(char **saved)
+char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
 	char	*line_return;
 
+	if (bytes_readed < 0)
+	{
+		free (*saved);
+		*saved = NULL;
+		return (NULL);
+	}
 	if (ft_strchr_n(*saved) != NULL)
 		line_return = ft_split_saved(saved);
 	else

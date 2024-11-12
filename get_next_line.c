@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/12 17:11:35 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/12 17:26:26 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,28 +86,6 @@ ssize_t	ft_keep_reading(int fd, char **saved)
 	return (bytes_readed);
 }
 
-// If n exists in saved, splits saved into two parts: before and after n
-char	*ft_split_saved(char **saved)
-{
-	char	*next_n; // Pointer to next n
-	char	*line_return; // Line to return
-	char	*temp; // Temp to store saved
-
-	next_n = ft_strchr_n(*saved); // Find n
-	line_return = ft_substr(*saved, 0, next_n - *saved + 1); // New string from start to n, + 1 for \0
-	if (*next_n && *(next_n + 1)) // Check in case n is right before EOF
-	{
-		temp = ft_strdup(next_n + 1); // Copy remaining string after n
-		free (*saved); // Free saved to avoid leaks
-		*saved = temp; // We update our saved string
-	}
-	else
-	{
-		free (*saved); // If there's nothing remaining after n; reset saved
-		*saved = NULL; // Always NULL saved after freeing it for future calls to GNL
-	}
-	return (line_return);
-}
 // Checks for errors and n in saved
 char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
@@ -131,6 +109,29 @@ char	*get_return_line(char **saved, ssize_t bytes_readed)
 	{
 		free (*saved);
 		*saved = NULL;
+	}
+	return (line_return);
+}
+
+// If n exists in saved, splits saved into two parts: before and after n
+char	*ft_split_saved(char **saved)
+{
+	char	*next_n; // Pointer to next n
+	char	*line_return; // Line to return
+	char	*temp; // Temp to store saved
+
+	next_n = ft_strchr_n(*saved); // Find n
+	line_return = ft_substr(*saved, 0, next_n - *saved + 1); // New string from start to n, + 1 for \0
+	if (*next_n && *(next_n + 1)) // Check in case n is right before EOF
+	{
+		temp = ft_strdup(next_n + 1); // Copy remaining string after n
+		free (*saved); // Free saved to avoid leaks
+		*saved = temp; // We update our saved string
+	}
+	else
+	{
+		free (*saved); // If there's nothing remaining after n; reset saved
+		*saved = NULL; // Always NULL saved after freeing it for future calls to GNL
 	}
 	return (line_return);
 }

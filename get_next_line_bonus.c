@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/06 18:23:14 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/12 17:26:42 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,29 +86,6 @@ static ssize_t	ft_keep_reading(int fd, char **saved)
 	return (bytes_readed);
 }
 
-// Divides saved in two after and before n
-static char	*ft_split_saved(char **saved)
-{
-	char	*next_n;
-	char	*line_return;
-	char	*temp;
-
-	next_n = ft_strchr_n(*saved);
-	line_return = ft_substr(*saved, 0, next_n - *saved + 1);
-	if (*next_n && *(next_n + 1))
-	{
-		temp = ft_strdup(next_n + 1);
-		free (*saved);
-		*saved = temp;
-	}
-	else
-	{
-		free (*saved);
-		*saved = NULL;
-	}
-	return (line_return);
-}
-
 static char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
 	char	*line_return;
@@ -128,6 +105,28 @@ static char	*get_return_line(char **saved, ssize_t bytes_readed)
 		*saved = NULL;
 	}
 	if (!line_return && *saved)
+	{
+		free (*saved);
+		*saved = NULL;
+	}
+	return (line_return);
+}
+// Divides saved in two after and before n
+static char	*ft_split_saved(char **saved)
+{
+	char	*next_n;
+	char	*line_return;
+	char	*temp;
+
+	next_n = ft_strchr_n(*saved);
+	line_return = ft_substr(*saved, 0, next_n - *saved + 1);
+	if (*next_n && *(next_n + 1))
+	{
+		temp = ft_strdup(next_n + 1);
+		free (*saved);
+		*saved = temp;
+	}
+	else
 	{
 		free (*saved);
 		*saved = NULL;

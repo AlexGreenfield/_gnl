@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:15 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/02 21:00:44 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/02 21:03:35 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
-# ifndef MAXFD
-#  define MAXFD 1048576
+# ifndef FD_SIZE
+#  define FD_SIZE 1048576
 # endif
 
 # include <stddef.h>

@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/02 12:38:59 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/12 17:11:35 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ char	*get_next_line(int fd)
 	bytes_readed = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0) // Check for invalid size or no valid fd
 		return (NULL);
-	if (!saved) // If there's nothing in saved, we read until the next n or EOF
+	if (!saved) // If there's nothing in saved, we make a first read
 		bytes_readed = ft_read(fd, &saved);
-	while (saved != NULL && ft_strchr_n(saved) == NULL) // Store until n or EOF
+	while (saved != NULL && ft_strchr_n(saved) == NULL) // Read and store until n or EOF
 	{
 		bytes_readed = ft_keep_reading(fd, &saved);
-		if (bytes_readed <= 0) // Check for 0 bytes read of -1 if anything fails
+		if (bytes_readed <= 0) // Check for 0 bytes read or -1 if anything fails
 			break ;
 	}
 	line_return = get_return_line(&saved, bytes_readed); // After reading, we gen our line
@@ -61,7 +61,7 @@ ssize_t	ft_read(int fd, char **saved)
 		return (-1);
 	return (bytes_readed);
 }
-
+// Join new reads into static saved string
 ssize_t	ft_keep_reading(int fd, char **saved)
 {
 	char	*temp; // Temp to store saved string for joining
@@ -108,7 +108,7 @@ char	*ft_split_saved(char **saved)
 	}
 	return (line_return);
 }
-
+// Checks for errors and n in saved
 char	*get_return_line(char **saved, ssize_t bytes_readed)
 {
 	char	*line_return;

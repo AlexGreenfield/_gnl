@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 17:30:18 by acastrov          #+#    #+#             */
-/*   Updated: 2024/11/02 20:58:08 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/11/06 18:23:14 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static char		*get_return_line(char **saved, ssize_t bytes_readed);
 // Reads and saves until n, returns line and stores for future calls
 char	*get_next_line(int fd)
 {
-	static char	*saved[MAXFD]; // Sames as GNL but static it's an array according to FD
+	static char	*saved[FD_SIZE]; // Sames as GNL but static it's an array according to FD
 	char		*line_return;
 	ssize_t		bytes_readed;
 
